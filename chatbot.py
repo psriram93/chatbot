@@ -59,3 +59,42 @@ for question in questions:
 clean_answers = []
 for answer in answers:
     clean_answers.append(clean_text(answer))
+    
+word2count = {}
+for question in clean_questions:
+    for word in question.split():
+        if word not in word2count:
+            word2count[word] = 1
+        else:
+            word2count[word] += 1
+
+for answer in clean_answers:
+    for word in answer.split():
+        if word not in word2count:
+            word2count[word] = 1
+        else:
+            word2count[word] += 1
+            
+threshold = 20
+questionswords2int ={}
+word_number = 0
+for word,count in word2count.items():
+    if count>=threshold:
+        questionswords2int[word] = word_number
+        word_number+=1
+answerswords2int = {}
+word_number = 0       
+for word,count in word2count.items():
+    if count>=threshold:
+        answerswords2int[word] = word_number
+        word_number+=1
+        
+tokens = ["<PAD>","<EOS>","<OUT>","<SOS>"]
+for token in tokens:
+    questionswords2int[token] = len(questionswords2int)+1
+
+for token in tokens:
+    answerswords2int[token] = len(answerswords2int)+1
+    
+answersint2words = {w_i: w for w,w_i in answerswords2int.items()}
+

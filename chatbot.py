@@ -98,3 +98,56 @@ for token in tokens:
     
 answersint2words = {w_i: w for w,w_i in answerswords2int.items()}
 
+for i in range(len(clean_answers)):
+    clean_answers[i] += " <EOS>"
+
+questions_to_int = []
+for question in clean_questions:
+    ints = []
+    for word in question.split():
+        if word not in questionswords2int:
+            ints.append(questionswords2int["<OUT>"])
+        else:
+            ints.append(questionswords2int[word])
+    questions_to_int.append(ints)
+    
+answers_to_int = []
+for answer in clean_answers:
+    ints = []
+    for word in answer.split():
+        if word not in answerswords2int:
+            ints.append(answerswords2int["<OUT>"])
+        else:
+            ints.append(answerswords2int[word])
+    answers_to_int.append(ints)
+    
+sorted_clean_questions = []
+sorted_clean_answers = []
+
+for length in range(1,25+1):
+    for i in enumerate(questions_to_int):
+        if len(i[1]) == length:
+            sorted_clean_questions.append(questions_to_int[i[0]])
+            sorted_clean_answers.append(answers_to_int[i[0]])
+            
+#seq2seq model
+            
+def model_input():
+    inputs = tf.placeholder(tf.int32,[None,None],name = "input")
+    targets = tf.placeholder(tf.int32,[None,None],name = "target")
+    lr = tf.placeholder(tf.float32,name = "learning_rate")
+    keep_prob = tf.placeholder(tf.float32,name = "keep_prob")
+    return puts,targets,lr,keep_prob
+
+#preprocessing the target
+    
+def preprocess_targets(targets,word2int,batch_size):
+    left_side = tf.fill([batch_size,1],word2int["<SOS>"])
+    right_side = tf.strided_slice(targets,[0,0],[batch_size,-1],[1,1])
+    preprocessed_targets = tf.concat([left_side,right_side],1)
+    return preprocessed_targets
+
+
+
+    
+    
